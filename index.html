@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Tasks — Premium To-Do App</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<div class="app-wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">✅</div>
+      <div>
+        <div class="logo-text">My Tasks</div>
+        <div class="logo-sub">Stay productive today</div>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="live-date" id="live-date"></div>
+      <div class="live-time" id="live-time"></div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="voice-btn" title="Voice Input">🎤</button>
+      <button class="icon-btn" id="notif-btn" title="Enable Notifications">🔔</button>
+      <button class="icon-btn" id="theme-btn" title="Toggle Dark Mode">🌙</button>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num blue" id="s-total">0</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num pink" id="s-pending">0</div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num green" id="s-done">0</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card streak-card">
+      <div class="stat-num orange" id="s-streak">0</div>
+      <div class="stat-label">Day Streak 🔥</div>
+    </div>
+  </div>
+
+  <!-- Progress Circle + Bar Row -->
+  <div class="progress-section">
+    <div class="circle-wrap">
+      <svg class="circle-svg" viewBox="0 0 100 100">
+        <circle class="circle-bg" cx="50" cy="50" r="42"/>
+        <circle class="circle-fill" id="circle-fill" cx="50" cy="50" r="42"/>
+      </svg>
+      <div class="circle-text">
+        <span class="circle-pct" id="circle-pct">0%</span>
+        <span class="circle-label">Done</span>
+      </div>
+    </div>
+    <div class="progress-right">
+      <div class="prog-wrap">
+        <span class="prog-label">Today's Progress</span>
+        <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+        <span class="prog-pct" id="prog-pct">0%</span>
+      </div>
+      <div class="quote-wrap" id="quote-wrap">
+        <span class="quote-icon">💡</span>
+        <span class="quote-text" id="quote-text">Loading quote...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pomodoro Timer -->
+  <div class="pomo-card" id="pomo-card">
+    <div class="pomo-header">
+      <span class="pomo-title">🍅 Pomodoro Timer</span>
+      <div class="pomo-modes">
+        <button class="pomo-mode active" data-min="25" data-label="Focus">Focus 25m</button>
+        <button class="pomo-mode" data-min="5" data-label="Short Break">Break 5m</button>
+        <button class="pomo-mode" data-min="15" data-label="Long Break">Long 15m</button>
+      </div>
+    </div>
+    <div class="pomo-display">
+      <div class="pomo-time" id="pomo-time">25:00</div>
+      <div class="pomo-label" id="pomo-status">Ready to focus</div>
+    </div>
+    <div class="pomo-controls">
+      <button class="pomo-btn start" id="pomo-start">▶ Start</button>
+      <button class="pomo-btn pause" id="pomo-pause" disabled>⏸ Pause</button>
+      <button class="pomo-btn reset" id="pomo-reset">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- Input Card -->
+  <div class="input-card">
+    <div class="input-title">➕ Add New Task</div>
+    <div class="input-row">
+      <input class="task-inp" id="task-input" type="text" placeholder="What do you need to do?" autocomplete="off" />
+      <input class="date-inp" id="date-input" type="date" />
+      <select class="pri-sel" id="pri-select">
+        <option value="low">🟢 Low</option>
+        <option value="medium" selected>🟡 Medium</option>
+        <option value="high">🔴 High</option>
+      </select>
+      <select class="cat-sel" id="cat-select">
+        <option value="personal">❤️ Personal</option>
+        <option value="work">💼 Work</option>
+        <option value="study">📘 Study</option>
+        <option value="health">💪 Health</option>
+      </select>
+      <button class="add-btn" id="add-btn">+ Add</button>
+    </div>
+    <div class="input-row">
+      <input class="task-inp" id="notes-input" type="text" placeholder="📝 Add a note (optional)..." style="flex:1" />
+    </div>
+  </div>
+
+  <!-- Search + Sort Bar -->
+  <div class="search-sort-row">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-inp" id="search-input" type="text" placeholder="Search tasks..." />
+    </div>
+    <select class="sort-sel" id="sort-select">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="priority">By Priority</option>
+      <option value="deadline">By Deadline</option>
+    </select>
+  </div>
+
+  <!-- Filter Buttons -->
+  <div class="filters-row">
+    <button class="f-btn active" data-filter="all">All</button>
+    <button class="f-btn" data-filter="pending">Pending</button>
+    <button class="f-btn" data-filter="done">Completed</button>
+    <button class="f-btn" data-filter="high">🔴 High</button>
+    <button class="f-btn" data-filter="work">💼 Work</button>
+    <button class="f-btn" data-filter="study">📘 Study</button>
+    <button class="f-btn" data-filter="health">💪 Health</button>
+  </div>
+
+  <!-- Task List -->
+  <div class="tasks-wrap" id="tasks-list"></div>
+
+  <!-- Analytics Section -->
+  <div class="analytics-card" id="analytics-card">
+    <div class="analytics-title">📈 Weekly Analytics</div>
+    <div class="analytics-bars" id="analytics-bars"></div>
+    <div class="analytics-score">
+      Productivity Score: <span id="prod-score" class="score-val">0</span>/100
+    </div>
+  </div>
+
+</div>
+
+<!-- Task Edit Modal -->
+<div class="modal-overlay" id="modal-overlay" style="display:none">
+  <div class="modal-card">
+    <div class="modal-title">✏️ Edit Task</div>
+    <input class="task-inp" id="edit-text" type="text" placeholder="Task name" />
+    <input class="task-inp" id="edit-note" type="text" placeholder="Note..." style="margin-top:10px" />
+    <input class="date-inp" id="edit-date" type="date" style="margin-top:10px;width:100%" />
+    <div class="subtask-section">
+      <div class="subtask-title">Subtasks</div>
+      <div id="subtasks-list"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input class="task-inp" id="subtask-input" type="text" placeholder="Add subtask..." style="flex:1" />
+        <button class="add-btn" id="add-subtask-btn" style="padding:10px 16px">+</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="add-btn" id="save-edit-btn">💾 Save</button>
+      <button class="f-btn" id="close-modal-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Voice listening overlay -->
+<div class="voice-overlay" id="voice-overlay" style="display:none">
+  <div class="voice-box">
+
+    <!-- Mic mode (real speech recognition) -->
+    <div id="voice-mic-ui">
+      <div class="voice-pulse">🎤</div>
+      <div class="voice-msg" id="voice-status">Starting microphone...</div>
+      <button class="f-btn" id="stop-voice-btn" style="margin-top:8px">✕ Cancel</button>
+    </div>
+
+    <!-- Fallback: type mode -->
+    <div id="voice-type-ui" style="display:none">
+      <div style="font-size:36px;margin-bottom:10px">⌨️</div>
+      <div class="voice-msg" style="margin-bottom:14px">
+        Voice not available here.<br>
+        <span style="font-size:12px;opacity:0.7">Type your task below (works on file://)</span>
+      </div>
+      <input
+        id="voice-type-inp"
+        class="task-inp"
+        type="text"
+        placeholder="Type your task here..."
+        style="width:100%;margin-bottom:12px;text-align:center"
+      />
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="add-btn" onclick="submitVoiceType()">✅ Add Task</button>
+        <button class="f-btn"   id="stop-voice-btn2">✕ Cancel</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
